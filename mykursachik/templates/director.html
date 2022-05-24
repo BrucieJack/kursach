@@ -5,9 +5,20 @@
     <title>Django Forms</title>
   </head>
   <body>
+    <form method="POST">
+      {% csrf_token %}
+      <table>
+        {{ form }}
+      </table>
+      <input type="submit" value="Send" />
+    </form>
     <table>
       {% for director in directors %}
-      <h5>{{ director.name }}</h5>
+      <h3>
+        Имя: {{ director.name }} | Потробности: {{ director.details }} |
+        Возраст: {{director.age }} | Опыт работы: {{director.experience }}
+      </h3>
+      <hr />
       {% endfor %}
     </table>
   </body>

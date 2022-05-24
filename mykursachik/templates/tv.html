@@ -5,9 +5,20 @@
     <title>Django Forms</title>
   </head>
   <body>
+    <form method="POST">
+      {% csrf_token %}
+      <table>
+        {{ form }}
+      </table>
+      <input type="submit" value="Send" />
+    </form>
     <table>
       {% for ad in ads %}
-      <h5>{{ ad.name }}</h5>
+      <h3>
+        Название: {{ ad.name }} | Потробности: {{ ad.details }} | Цена:
+        {{ad.price }} | Оценка: {{ad.mark}}
+      </h3>
+      <hr />
       {% endfor %}
     </table>
   </body>

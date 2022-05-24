@@ -2,10 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User, auth
 
 # Create your models here.
-class Feature(models.Model):
-    name = models.CharField(max_length=100)
-    details = models.CharField(max_length=500)
-
 
 class Director(models.Model):
      name = models.CharField(max_length=100)
@@ -19,9 +15,24 @@ class Director(models.Model):
 class Ad(models.Model):
     name = models.CharField(max_length=100)
     details = models.CharField(max_length=500)
+    mark = models.IntegerField()
     price = models.IntegerField()
     director = models.ForeignKey(Director, on_delete = models.PROTECT)
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.PROTECT)
+
+class Method(models.Model):
+    v1_order = models.IntegerField()
+    v1_mark = models.IntegerField()
+    v2_order = models.IntegerField()
+    v2_mark = models.IntegerField()
+    v3_order = models.IntegerField()
+    v3_mark = models.IntegerField()
+
+
+
+
+
+
 
 
    

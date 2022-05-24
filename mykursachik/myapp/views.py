@@ -2,26 +2,19 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
-from .models import Feature
 from .models import Ad
 from .models import Director
+from .models import Method
 from .forms import AdForm
 from .forms import DirectorForm
 from .forms import RegisterForm
 from .forms import LoginForm
+from .forms import Search
 # Create your views here.
 
 def index(request):
-    # context = {
-    #     'name': 'Niita',
-    # }
-    features = Feature.objects.all()
-    return render(request, 'index.html', {'features':features})
+    return render(request, 'index.html')
 
-
-def counter(request):
-    words = request.GET['words']
-    return render(request, 'counter.html')
 
 #Register/Login
 
@@ -76,14 +69,14 @@ def logout(request):
 # TV
 
 def tv(request):
-    ads = Ad.objects.order_by()
+    ads = Ad.objects.order_by('-mark')
     data = {"ads": ads}
     return render(request, 'tv.html', context=data)
 
 def tv_filtrated(request):
     ads = Ad.objects.filter(price__lte = 100)
     data = {"ads": ads}
-    return render(request, 'tv_filtrated.html', context=data)
+    return render(request, 'tv.html', context=data)
 
 def create_tv(request):
     if request.method == 'POST':
@@ -104,6 +97,16 @@ def create_tv(request):
         adform = AdForm()
         return render(request, 'tv_create.html', {"form": adform})
 
+def tv_search(request):
+    if request.method == 'POST':
+        search = request.POST['search']
+        ads = Ad.objects.filter(name=search)
+        data = {"ads": ads}
+        return render(request, 'tv.html', context=data)
+    else:
+        form = Search()
+        return render(request, 'tv_create.html', {"form": form})
+
 
 
 # Director
@@ -113,10 +116,81 @@ def director(request):
      data = {"directors": directors}
      return render(request, 'director.html', context=data)
 
+def director_search(request):
+    if request.method == 'POST':
+        search = request.POST['search']
+        directors = Director.objects.filter(name=search)
+        data = {"directors": directors}
+        return render(request, 'director.html', context=data)
+    else:
+        form = Search()
+        return render(request, 'tv_create.html', {"form": form})
+
+
+def director_filtrated(request):
+     directors = Director.objects.filter(age__lte = 100)
+     data = {"directors": directors}
+     return render(request, 'director.html', context=data)
 
 
 
+# Method
 
+def method(request):
+    method = Method.objects.all()
 
-def post(request, pk):
-    return render(request, 'post.html', {'pk' : pk})
+    if not method:
+        ads = Ad.objects.order_by('-mark')
+        v1_order = 0
+        v2_order = 1
+        v3_order = 2
+        v1_mark = ads[v1_order].mark
+        v2_mark = ads[v2_order].mark
+        v3_mark = ads[v3_order].mark
+        v1_name = ads[v1_order].name
+        v2_name = ads[v2_order].name
+        v3_name = ads[v3_order].name
+        if request.method == 'POST':
+            method = Method.objects.create(v1_order=v1_order, v2_order=v2_order, v3_order=v3_order, v1_mark=v1_mark, v2_mark=v2_mark, v3_mark=v3_mark)
+            method.save()
+            choice = request.POST['choice']
+            kekplus = int(request.POST['kekplus'])
+            if choice == "left" and v1_mark < v2_mark + v3_mark:
+                v1_mark += kekplus
+            elif choice == "right" and v1_mark > v2_mark + v3_mark:
+                v1_mark -= kekplus
+            Ad.objects.filter(id = (v1_order+1)).update(mark = v1_mark)
+            return redirect('method')
+        data = {"v1_name": v1_name, "v2_name": v2_name, "v3_name": v3_name, "v1_mark": v1_mark, "v2_mark": v2_mark, "v3_mark": v3_mark}
+        return render(request, 'method.html', context=data)
+    else:
+        ads = Ad.objects.order_by('-mark')
+        method = Method.objects.latest('v1_order')
+        adsAmount = int(Ad.objects.all().count())
+        v1_order = int(method.v2_order)
+        v2_order = int(v1_order + 1)
+        v3_order = int(v2_order + 1)
+        if v3_order == adsAmount:
+            return redirect('tv')
+        v1_mark = ads[v1_order].mark
+        v2_mark = ads[v2_order].mark
+        v3_mark = ads[v3_order].mark
+        v1_name = ads[v1_order].name
+        v2_name = ads[v2_order].name
+        v3_name = ads[v3_order].name
+        data = {"v1_name": v1_name, "v2_name": v2_name, "v3_name": v3_name, "v1_mark": v1_mark, "v2_mark": v2_mark, "v3_mark": v3_mark}
+        if request.method == 'POST':
+            method = Method.objects.create(v1_order=v1_order, v2_order=v2_order, v3_order=v3_order, v1_mark=v1_mark, v2_mark=v2_mark, v3_mark=v3_mark)
+            method.save()
+            choice = request.POST['choice']
+            kekplus = int(request.POST['kekplus'])
+            if choice == "left" and v1_mark < v2_mark + v3_mark:
+                v1_mark += kekplus
+            elif choice == "right" and v1_mark > v2_mark + v3_mark:
+                v1_mark -= kekplus
+            Ad.objects.filter(id = (v1_order+1)).update(mark = v1_mark)
+            return redirect('method')
+        return render(request, 'method.html', context=data)
+    
+        
+
