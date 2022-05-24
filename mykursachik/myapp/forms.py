@@ -11,7 +11,6 @@ class AdForm(forms.Form):
     director = forms.ModelChoiceField(queryset=Director.objects.all())
     user = forms.ModelChoiceField(queryset=User.objects.all())
 
-
 class DirectorForm(forms.Form):
      name = forms.CharField(max_length=100)
      details = forms.CharField(max_length=500)
@@ -29,5 +28,10 @@ class RegisterForm(forms.Form):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
+
+class Search(forms.Form):
+    search = forms.CharField()
+
+
     
  

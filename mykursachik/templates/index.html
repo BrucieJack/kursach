@@ -1,6 +1,21 @@
 {% if user.is_authenticated %}
-<h1>Sosi {{user.username}}</h1>
+<h1>Hello {{user.username}}</h1>
 {% endif %}
+<a href="tv">Рекламные проекты(Отсортированные)</a>
+<br />
+<a href="create_tv">Создать рекламный проект</a>
+<br />
+<a href="tv_filtrated">Рекламные проекты(Отфильтрованные)</a>
+<br />
+<a href="tv_search">Поиск проектов</a>
+<br />
+<a href="director">Режисёры(Отсортированные)</a>
+<br />
+<a href="director_filtrated">Режисёры(Отфильтрованные)</a>
+<br />
+<a href="director_search">Поиск режисёров</a>
+<br />
+<a href="method">Метод</a>
 <br />
 {% if user.is_authenticated %}
 <a href="logout">Logout</a>
