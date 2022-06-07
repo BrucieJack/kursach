@@ -16,34 +16,57 @@ def index(request):
     return render(request, 'index.html')
 
 
+
+#baseclass for polimorfism    
+
+class FilterSortController():
+    def filter(self):
+        print("Функция не перегружена ")
+        return redirect('/')
+
+    def sort(self):
+        print("Функция не перегружена ")
+        return redirect('/')
+
+    def render(self, url):
+        if url == 'tv':
+            return 'tv.html'
+        elif url == 'director': 
+            return 'director.html'
+
+
+
+
 #Register/Login
 
-
 def register(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        password2 = request.POST['password2']
+    try:
+        if request.method == 'POST':
+            username = request.POST['username']
+            email = request.POST['email']
+            password = request.POST['password']
+            password2 = request.POST['password2']
 
-        if password == password2:
-            if User.objects.filter(email=email).exists():
-                messages.info(request, 'Email Already Exists')
+            if password == password2:
+                if User.objects.filter(email=email).exists():
+                    messages.info(request, 'Email Already Exists')
+                    return redirect('register')
+                elif User.objects.filter(username=username).exists():
+                    messages.info(request, 'Username Already Exists')
+                    return redirect('register')
+                else:
+                    user = User.objects.create_user(username=username, email=email, password=password,)
+                    user.save()
+                    return redirect('login')
+        
+            else: 
+                messages.info(request, 'Password Not The Same')
                 return redirect('register')
-            elif User.objects.filter(username=username).exists():
-                 messages.info(request, 'Username Already Exists')
-                 return redirect('register')
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password,)
-                user.save()
-                return redirect('login')
-    
-        else: 
-            messages.info(request, 'Password Not The Same')
-            return redirect('register')
-    else:
+        else:
 
-        return render(request, 'register.html')
+            return render(request, 'register.html')
+    except:
+        print("Страница регистрации выдала критическую ошибку")
 
 def login(request):
      if request.method == 'POST':
@@ -68,15 +91,33 @@ def logout(request):
 
 # TV
 
+class TvSort(FilterSortController):
+    def sort(self):
+        ads = Ad.objects.order_by('-mark')
+        data = {"ads": ads}
+        return data
+
+
+
 def tv(request):
-    ads = Ad.objects.order_by('-mark')
-    data = {"ads": ads}
-    return render(request, 'tv.html', context=data)
+    tv = TvSort()
+    return render(request, tv.render('tv'), context=tv.sort())
+
+
+
+class TvFilter(FilterSortController):
+    def filter(self):
+        ads = Ad.objects.filter(price__lte = 100)
+        data = {"ads": ads}
+        return data
+
+
 
 def tv_filtrated(request):
-    ads = Ad.objects.filter(price__lte = 100)
-    data = {"ads": ads}
-    return render(request, 'tv.html', context=data)
+    tv = TvFilter()
+    return render(request, tv.render('tv'), context=tv.filter())
+
+
 
 def create_tv(request):
     if request.method == 'POST':
@@ -111,10 +152,18 @@ def tv_search(request):
 
 # Director
 
+class DirectorSort(FilterSortController):
+    def sort(self):
+        directors = Director.objects.order_by()
+        data = {"directors": directors}
+        return data
+
+
 def director(request):
-     directors = Director.objects.order_by()
-     data = {"directors": directors}
-     return render(request, 'director.html', context=data)
+    director = DirectorSort()
+    return render(request, director.render('director'), context=director.sort())
+
+
 
 def director_search(request):
     if request.method == 'POST':
@@ -127,16 +176,28 @@ def director_search(request):
         return render(request, 'tv_create.html', {"form": form})
 
 
+
+class DirectorFilter(FilterSortController):
+    def filter(self):
+        directors = Director.objects.filter(age__lte = 30)
+        data = {"directors": directors}
+        return data
+
+
 def director_filtrated(request):
-     directors = Director.objects.filter(age__lte = 100)
-     data = {"directors": directors}
-     return render(request, 'director.html', context=data)
+    director = DirectorFilter()
+    return render(request, director.render('director'), context=director.filter())
 
 
 
 # Method
 
+iterator = [0, 1, 2, 3]
+
 def method(request):
+    data = iter(iterator)
+    print(next(data))
+    print(next(data))
     method = Method.objects.all()
 
     if not method:
